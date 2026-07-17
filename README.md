@@ -1,5 +1,9 @@
 # MiMo-Code — Node.js Port
 
+<p align="center">
+  <img src="assets/logo/mimocode.svg" alt="MiMo-Code Logo" width="120" height="120"/>
+</p>
+
 **Браузер для LLM.** Как Chrome ходит на веб-серверы, так MiMo-Code ходит на LLM-серверы Xiaomi.
 
 **Автор:** Nick Antonov, Borodachamba Studio (1998-2026). All rights reserved.
