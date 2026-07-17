@@ -1,0 +1,1 @@
+cmd_Release/obj.target/bun_ffi_shim.node := g++ -o Release/obj.target/bun_ffi_shim.node -shared -pthread -rdynamic -m64  -Wl,-soname=bun_ffi_shim.node -Wl,--start-group Release/obj.target/bun_ffi_shim/src/bun_ffi_shim.o -Wl,--end-group -lffi -ldl
