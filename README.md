@@ -1,12 +1,8 @@
 # MiMo-Code — Node.js Port
 
-```
-█▀▄▀█ █ █▄ ▄█ █▀▀█ █▀▀ █▀▀█ █▀▀▄ █▀▀▀
-█ ▀ █ █ █ ▀ █ █  █ █   █  █ █  █ █▀▀ 
-▀   ▀ ▀ ▀   ▀ ▀▀▀▀ ▀▀▀ ▀▀▀▀ ▀▀▀  ▀▀▀▀
-```
-
-> **Borodachamba** <span style="color:#888">MiMo Code Port</span> <span style="color:#e94560">no BUN</span>
+<p align="center">
+  <img src="assets/logo/borodachamba.svg" alt="MiMo Code Port no BUN" width="600"/>
+</p>
 
 **Браузер для LLM.** Как Chrome ходит на веб-серверы, так MiMo-Code ходит на LLM-серверы Xiaomi.
 

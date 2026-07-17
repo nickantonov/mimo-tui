@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120" width="600" height="120">
+  <rect width="600" height="120" rx="12" fill="#1a1a2e"/>
+  
+  <!-- MiMo текст оранжевый -->
+  <text x="20" y="55" font-family="monospace" font-size="42" font-weight="bold" fill="#e94560">MiMo</text>
+  
+  <!-- Code текст серый -->
+  <text x="175" y="55" font-family="monospace" font-size="42" font-weight="bold" fill="#666">Code</text>
+  
+  <!-- Port текст серый -->
+  <text x="310" y="55" font-family="monospace" font-size="42" font-weight="bold" fill="#666">Port</text>
+  
+  <!-- no BUN оранжевый -->
+  <text x="420" y="55" font-family="monospace" font-size="42" font-weight="bold" fill="#e94560">no BUN</text>
+  
+  <!-- Подпись -->
+  <text x="20" y="95" font-family="monospace" font-size="16" fill="#888">Borodachamba Studio — Node.js替代Bun</text>
+  
+  <!-- Декоративная линия -->
+  <line x1="20" y1="70" x2="580" y2="70" stroke="#e94560" stroke-width="2" opacity="0.3"/>
+</svg>
