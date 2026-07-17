@@ -101,6 +101,11 @@ export function logo(pad?: string) {
     result.push(draw(other, right.fg, right.shadow, right.bg))
     result.push(EOL)
   })
+  // Borodachamba branding
+  const brand = "\x1b[38;5;238mBorodachamba\x1b[0m \x1b[38;5;245mMiMo Code Port \x1b[38;5;196mno BUN\x1b[0m"
+  if (pad) result.push(pad)
+  result.push(brand)
+  result.push(EOL)
   return result.join("").trimEnd()
 }
 
