@@ -30,46 +30,40 @@ MiMo-Code — терминальный TUI-клиент (fork OpenCode), кот�
 
 ## Быстрый старт
 
-### Зависимости
-
-- **Node.js** >= 22.23.1 (через nvm)
-- **esbuild** (для трансформации TypeScript)
-- **@esbuild/linux-x64** (платформенный бинарник esbuild)
-
 ### Установка
 
+**Linux:**
 ```bash
-# 1. Установить nvm и Node.js 22
+curl -fsSL https://raw.githubusercontent.com/nickantonov/mimocode-nodejs-port/master/install.sh | bash
+```
+
+**Windows:**
+```powershell
+# Открой PowerShell от администратора или:
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+**Ручная установка:**
+```bash
+# Node.js
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
 nvm install 22
 
-# 2. Установить esbuild глобально
+# esbuild
 npm install -g esbuild
 
-# 3. Слинковать платформенный пакет
-ln -s $(npm root -g)/@esbuild packages/opencode/node_modules/@esbuild
-
-# 4. Запуск
-cd packages/opencode
-node --no-experimental-strip-types run-node.mjs --help
+# Запуск
+./mimo --help
 ```
 
 ### Запуск
 
 ```bash
-# TUI (интерактивный режим)
-node --no-experimental-strip-types run-node.mjs
-
-# CLI (одноразовый запрос)
-node --no-experimental-strip-types run-node.mjs run "привет"
-node --no-experimental-strip-types run-node.mjs run "привет" -m "opencode/mimo-v2.5-free"
-
-# Список моделей
-node --no-experimental-strip-types run-node.mjs models
-
-# Статистика
-node --no-experimental-strip-types run-node.mjs stats
+mimo --help          # справка
+mimo run "привет"    # запрос к LLM
+mimo run "привет" -m "opencode/mimo-v2.5-free"  # конкретная модель
+mimo models          # список моделей
+mimo stats           # статистика
 ```
 
 ## Как это работает
