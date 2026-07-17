@@ -2,6 +2,8 @@
 
 **Браузер для LLM.** Как Chrome ходит на веб-серверы, так MiMo-Code ходит на LLM-серверы Xiaomi.
 
+**Автор:** Nick Antonov, Borodachamba Studio (1998-2026). All rights reserved.
+
 ## Архитектура
 
 ```
