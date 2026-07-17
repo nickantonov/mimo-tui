@@ -1,13 +1,6 @@
-# MiMo-Code — Auto Installer
+# MiMo-Code Auto Installer for Windows
 # Borodachamba Studio, Nick Antonov 1998-2026. All rights reserved.
-#
-# Запуск: powershell -ExecutionPolicy Bypass -File install.ps1
-#
-# Автоматически:
-#   1. Проверяет и удаляет старую Bun версию
-#   2. Устанавливает Node.js если нет
-#   3. Ставит mimo в ~/.mimocode/bin
-#   4. Прописывает в PATH
+# Run: powershell -ExecutionPolicy Bypass -File install.ps1
 
 $ErrorActionPreference = "Continue"
 $MIMO_HOME = "$env:USERPROFILE\.mimocode"
@@ -15,23 +8,22 @@ $MIMO_BIN = "$MIMO_HOME\bin"
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host ""
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  MiMo-Code — Auto Installer" -ForegroundColor Cyan
-Write-Host "  Borodachamba Studio, Nick Antonov 1998-2026" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
+Write-Host "============================================"
+Write-Host "  MiMo-Code Auto Installer"
+Write-Host "  Borodachamba Studio"
+Write-Host "============================================"
 Write-Host ""
 
-# === Шаг 1: Проверка старой Bun версии ===
-Write-Host "[1/5] Проверка старой версии..." -ForegroundColor Yellow
+# Step 1: Check old Bun version
+Write-Host "[1/5] Checking for old Bun version..."
 
 $BUN_FOUND = $false
 foreach ($mimo in @("$MIMO_BIN\mimo.exe", "$MIMO_BIN\mimo")) {
     if (Test-Path $mimo) {
-        $content = [System.IO.File]::ReadAllBytes($mimo)[0..3]
-        if ($content[0] -eq 0x7f -and $content[1] -eq 0x45) {
-            # ELF binary = Bun
-            $size = (Get-Item $mimo).Length / 1MB
-            Write-Host "  Найдена старая версия Bun MiMo-Code ([math]::Round($size,0) MB)" -ForegroundColor Red
+        $bytes = [System.IO.File]::ReadAllBytes($mimo)
+        if ($bytes[0] -eq 0x7f -and $bytes[1] -eq 0x45) {
+            $size = [math]::Round((Get-Item $mimo).Length / 1MB, 1)
+            Write-Host "  Found old Bun MiMo-Code ($size MB)" -ForegroundColor Red
             $BUN_FOUND = $true
         }
     }
@@ -39,141 +31,93 @@ foreach ($mimo in @("$MIMO_BIN\mimo.exe", "$MIMO_BIN\mimo")) {
 
 if ($BUN_FOUND) {
     Write-Host ""
-    Write-Host "  Старая версия MiMo-Code на Bun будет заменена на Node.js порт." -ForegroundColor Yellow
-    Write-Host "  Все данные (сессии, конфиги) останутся на месте." -ForegroundColor Yellow
+    Write-Host "  Old Bun version will be replaced with Node.js port." -ForegroundColor Yellow
+    Write-Host "  All data (sessions, configs) will be kept." -ForegroundColor Yellow
     Write-Host ""
-    $reply = Read-Host "  Удалить старую версию? (Y/n)"
+    $reply = Read-Host "  Remove old version? (Y/n)"
     if ($reply -match "^[Nn]") {
-        Write-Host "  Установка отменена" -ForegroundColor Red
+        Write-Host "  Installation cancelled" -ForegroundColor Red
         exit 1
     }
-    # Удаляем Bun бинарники
     Remove-Item "$MIMO_BIN\mimo.exe" -Force -ErrorAction SilentlyContinue
     Remove-Item "$MIMO_BIN\mimo" -Force -ErrorAction SilentlyContinue
-    Write-Host "  Старая версия удалена" -ForegroundColor Green
+    Write-Host "  Old version removed" -ForegroundColor Green
 } else {
-    Write-Host "  Старая версия не найдена" -ForegroundColor Green
+    Write-Host "  No old version found" -ForegroundColor Green
 }
 
-# === Шаг 2: Проверка Node.js ===
+# Step 2: Check Node.js
 Write-Host ""
-Write-Host "[2/5] Проверка Node.js..." -ForegroundColor Yellow
+Write-Host "[2/5] Checking Node.js..."
 
 $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if ($nodeCmd) {
     $nodeVer = & node --version 2>&1
     Write-Host "  Node.js $nodeVer" -ForegroundColor Green
 } else {
-    Write-Host "  Node.js не найден!" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "  Скачайте Node.js LTS: https://nodejs.org/" -ForegroundColor White
-    Write-Host "  Или установите nvm-windows: https://github.com/coreybutler/nvm-windows" -ForegroundColor Gray
-    Write-Host ""
-    $reply = Read-Host "  Продолжить без Node.js? (y/N)"
-    if ($reply -notmatch "^[Yy]") {
-        exit 1
-    }
+    Write-Host "  Node.js not found!" -ForegroundColor Red
+    Write-Host "  Download from: https://nodejs.org/" -ForegroundColor White
+    Write-Host "  Or install nvm-windows: https://github.com/coreybutler/nvm-windows" -ForegroundColor Gray
+    exit 1
 }
 
-# === Шаг 3: Установка mimo ===
+# Step 3: Install mimo
 Write-Host ""
-Write-Host "[3/5] Установка MiMo-Code..." -ForegroundColor Yellow
+Write-Host "[3/5] Installing MiMo-Code..."
 
 New-Item -ItemType Directory -Force -Path $MIMO_BIN | Out-Null
 
-# Ищем node.exe
-$nodeExe = "node"
-$nodePath = Get-Command node -ErrorAction SilentlyContinue
-if ($nodePath) {
-    $nodeExe = $nodePath.Source
-}
+$foundNode = (Get-Command node -ErrorAction SilentlyContinue).Source
+if (-not $foundNode) { $foundNode = "node" }
 
-# Создаем mimo.cmd
 $mimoCmd = @"
 @echo off
 rem MiMo-Code Node.js launcher
-rem Borodachamba Studio, Nick Antonov 1998-2026. All rights reserved.
+rem Borodachamba Studio, Nick Antonov 1998-2026.
+set "NODE_EXE=$foundNode"
 set "SCRIPT_DIR=%~dp0"
-"%SCRIPT_DIR%..\..\packages\opencode\..\..\bin\node.exe" --no-experimental-strip-types "%SCRIPT_DIR%..\..\packages\opencode\run-node.mjs" %*
-"@
-
-# Ищем node.exe в стандартных местах
-$nodeLocations = @(
-    "$env:ProgramFiles\nodejs\node.exe",
-    "${env:ProgramFiles(x86)}\nodejs\node.exe",
-    "$env:LOCALAPPDATA\Programs\nodejs\node.exe",
-    "$env:APPDATA\nvm\v$((node --version 2>$null).Trim('v'))\node.exe"
-)
-
-$foundNode = $null
-foreach ($loc in $nodeLocations) {
-    if (Test-Path $loc) {
-        $foundNode = $loc
-        break
-    }
-}
-if (-not $foundNode) {
-    $foundNode = (Get-Command node -ErrorAction SilentlyContinue).Source
-}
-
-if (-not $foundNode) {
-    $foundNode = "node"
-}
-
-$mimoCmd = @"
-@echo off
-rem MiMo-Code Node.js launcher
-rem Borodachamba Studio, Nick Antonov 1998-2026. All rights reserved.
-set "NODE_EXE=$foundNode"
-"%NODE_EXE%" --no-experimental-strip-types "%SCRIPT_DIR%..\..\packages\opencode\run-node.mjs" %*
-"@
-
-$batCmd = @"
-@echo off
-rem MiMo-Code Node.js launcher (bat fallback)
-set "NODE_EXE=$foundNode"
 "%NODE_EXE%" --no-experimental-strip-types "%SCRIPT_DIR%..\..\packages\opencode\run-node.mjs" %*
 "@
 
 Set-Content -Path "$MIMO_BIN\mimo.cmd" -Value $mimoCmd -Encoding ASCII
-Set-Content -Path "$MIMO_BIN\mimo.bat" -Value $batCmd -Encoding ASCII
+Copy-Item "$MIMO_BIN\mimo.cmd" "$MIMO_BIN\mimo.bat" -Force
 
-Write-Host "  mimo установлен в $MIMO_BIN" -ForegroundColor Green
+Write-Host "  mimo installed to $MIMO_BIN" -ForegroundColor Green
 
-# === Шаг 4: PATH ===
+# Step 4: PATH
 Write-Host ""
-Write-Host "[4/5] Настройка PATH..." -ForegroundColor Yellow
+Write-Host "[4/5] Configuring PATH..."
 
 $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($currentPath -notlike "*$MIMO_BIN*") {
     [Environment]::SetEnvironmentVariable("Path", "$MIMO_BIN;$currentPath", "User")
     $env:Path = "$MIMO_BIN;$env:Path"
-    Write-Host "  $MIMO_BIN добавлен в PATH" -ForegroundColor Green
+    Write-Host "  Added $MIMO_BIN to PATH" -ForegroundColor Green
 } else {
-    Write-Host "  PATH уже настроен" -ForegroundColor Green
+    Write-Host "  PATH already configured" -ForegroundColor Green
 }
 
-# === Шаг 5: esbuild ===
+# Step 5: esbuild
 Write-Host ""
-Write-Host "[5/5] Проверка esbuild..." -ForegroundColor Yellow
+Write-Host "[5/5] Checking esbuild..."
 
 $esbuildCmd = Get-Command esbuild -ErrorAction SilentlyContinue
 if (-not $esbuildCmd) {
-    Write-Host "  Устанавливаю esbuild..." -ForegroundColor Gray
+    Write-Host "  Installing esbuild..." -ForegroundColor Gray
     & npm install -g esbuild 2>$null
 }
-Write-Host "  esbuild" -ForegroundColor Green
+Write-Host "  esbuild OK" -ForegroundColor Green
 
-# === Готово ===
+# Done
 Write-Host ""
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  Установка завершена!" -ForegroundColor Green
+Write-Host "============================================"
+Write-Host "  Installation complete!"
 Write-Host ""
-Write-Host "  Закройте и откройте новый терминал." -ForegroundColor Yellow
-Write-Host "  Затем:" -ForegroundColor White
+Write-Host "  Close and reopen terminal."
+Write-Host "  Then:"
 Write-Host ""
-Write-Host "  mimo --help          справка" -ForegroundColor White
-Write-Host "  mimo run `"привет`"    тест" -ForegroundColor White
-Write-Host "  mimo models          список моделей" -ForegroundColor White
-Write-Host "============================================" -ForegroundColor Cyan
+Write-Host "  mimo --help"
+Write-Host "  mimo run `"hello`""
+Write-Host "  mimo models"
+Write-Host "============================================"
 Write-Host ""
