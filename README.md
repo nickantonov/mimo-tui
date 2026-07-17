@@ -4,9 +4,9 @@
 █▀▄▀█ █ █▄ ▄█ █▀▀█ █▀▀ █▀▀█ █▀▀▄ █▀▀▀
 █ ▀ █ █ █ ▀ █ █  █ █   █  █ █  █ █▀▀ 
 ▀   ▀ ▀ ▀   ▀ ▀▀▀▀ ▀▀▀ ▀▀▀▀ ▀▀▀  ▀▀▀▀
-
-Borodachamba MiMo Code Port no BUN
 ```
+
+> **Borodachamba** <span style="color:#888">MiMo Code Port</span> <span style="color:#e94560">no BUN</span>
 
 **Браузер для LLM.** Как Chrome ходит на веб-серверы, так MiMo-Code ходит на LLM-серверы Xiaomi.
 
