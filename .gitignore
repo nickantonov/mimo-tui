@@ -1,9 +1,5 @@
-node_modules/
+__pycache__/
+*.pyc
+data/
+.env
 *.db
-*.db-shm
-*.db-wal
-*.log
-*.bak
-memory/
-tool-output/
-.turbo/

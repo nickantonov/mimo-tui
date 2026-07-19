@@ -1,211 +1,73 @@
-# MiMo-Code — Node.js Port
+# MiMo TUI v1.0
 
-<p align="center">
-  <img src="assets/logo/borodachamba.svg" alt="MiMo Code Port no BUN" width="600"/>
-</p>
+Автономний AI-асистент для програмування. Працює на Windows та Linux.
 
-**Браузер для LLM.** Как Chrome ходит на веб-серверы, так MiMo-Code ходит на LLM-серверы Xiaomi.
+**Без Bun, без opencode, без SolidJS** — просто Python + Rich + MiMo free-tier API.
 
-**Автор:** Nick Antonov, Borodachamba Studio (1998-2026). All rights reserved.
+## Швидкий старт
 
-## Архитектура
-
-```
-┌─────────────┐    ┌──────────────┐    ┌─────────────────────┐
-│  Пользователь │───▶│ MiMo-Code TUI │───▶│ Xiaomi LLM Backend  │
-│  (терминал)   │◀───│ (браузер)     │◀───│ (Alibaba Cloud)     │
-└─────────────┘    └──────────────┘    └─────────────────────┘
-                         │
-                    Node.js 22.23.1
-                    (ESM loader)
+### Windows
+```bat
+install.bat
+run.bat
 ```
 
-MiMo-Code — терминальный TUI-клиент (fork OpenCode), который подключается к серверам Xiaomi для инференса LLM. Модели (`mimo-v2.5-free`, `hy3-free` и др.) живут на стороне сервера. Клиент — это локальный TUI.
-
-**Проблема**: исходный клиент работает на Bun, который требует AVX. На старых процессорах без AVX (Xeon, AMD Opteron, старые Core) Bun не запускается. Порт на Node.js решает эту проблему.
-
-## Быстрый старт
-
-### Установка
-
-**Linux:**
+### Linux (Fedora/Ubuntu)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickantonov/mimocode-nodejs-port/master/install.sh | bash
+chmod +x install.sh run.sh
+./install.sh
+./run.sh
 ```
 
-**Windows:**
-```powershell
-# Открой PowerShell от администратора или:
-powershell -ExecutionPolicy Bypass -File install.ps1
-```
+## Що всередині
 
-**Ручная установка:**
-```bash
-# Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-nvm install 22
+| Компонент | Джерело | Призначення |
+|-----------|---------|-------------|
+| Brain (streaming + tool calling) | JARVIS | LLM engine з MiMo API + Ollama fallback |
+| 13 Tools | JARVIS | Файли, git, python, shell, система |
+| Memory (SQLite) | JARVIS | Граф знань, діалоги, бібліотека коду |
+| VibeCoder | JARVIS | Авто-повтор генерації коду |
+| Planner | JARVIS | Декомпозиція задач |
+| Cerebro | NATASHA7 | Особистість та навчання |
+| AST Analyzer | Predator | Аналіз якості Python коду |
+| Auth | Наша робота | MiMo free-tier bootstrap + fingerprint |
 
-# esbuild
-npm install -g esbuild
+## Команди
 
-# Запуск
-./mimo --help
-```
+- `/help` — Довідка
+- `/mode [назва]` — Режим (auto|code|plan|local|fast)
+- `/model s|f` — Модель (smart/fast)
+- `/plan <ціль>` — Додати задачу в планувальник
+- `/plans` — Черга планів
+- `/memory` — Статистика пам'яті
+- `/fact k=v` — Запам'ятати факт
+- `/ast <файл>` — AST перевірка Python файлу
+- `/cwd [шлях]` — Змінити робочу директорію
+- `/tokens` — Статистика токенів
+- `/status` — Системний статус (CPU/RAM)
+- `exit` — Вихід
 
-### Запуск
+## Режими
 
-```bash
-mimo --help          # справка
-mimo run "привет"    # запрос к LLM
-mimo run "привет" -m "opencode/mimo-v2.5-free"  # конкретная модель
-mimo models          # список моделей
-mimo stats           # статистика
-```
+- **AUTO** — Розумний автоматичний (за замовчуванням)
+- **CODE** — Вайбкодинг з авто-повтором
+- **PLAN** — Автономне планування задач
+- **LOCAL** — Тільки Ollama (офлайн)
+- **FAST** — Мала модель, економія токенів
 
-## Как это работает
+## Залежності
 
-### ESM Loader (txt-hooks.mjs)
+- Python 3.10+
+- rich, psutil
+- Опціонально: Ollama (для локального fallback)
 
-Node.js не понимает TypeScript, Bun-специфичные импорты и алиасы путей. Решение — кастомный ESM loader:
+## API
 
-1. **`resolve()` хук** — перехватывает импорты:
-   - `@tui/` → `./src/cli/cmd/tui/`
-   - `@/` → `./src/`
-   - `bun:sqlite` → `node:sqlite` shim
-   - `bun:ffi` → N-API addon
-   - `.ts` расширения → резолвится в `.ts` файлы
+Використовує MiMo free-tier через opencode.ai:
+- Auth: device fingerprint (SHA-256)
+- Endpoint: `https://opencode.ai/zen/v1/chat/completions`
+- Моделі: mimo-auto, hy3-free, mimo-v2.5-free
 
-2. **`load()` хук** — трансформирует файлы:
-   - `.ts` / `.tsx` → esbuild трансформация (target: node22)
-   - Если esbuild падает → stripTypes fallback (regex-based)
-   - 5s таймаут на esbuild (зависшие файлы)
-   - `.txt` → `export default content`
-   - `.wasm` → `export default filePath`
+## Credits
 
-### Bun Shim (run-node.mjs)
-
-`globalThis.Bun` устанавливается **в main thread** (не в ESM worker):
-
-| API | Реализация |
-|-----|-----------|
-| `Bun.file()` | `readFileSync` + lazy объект |
-| `Bun.write()` | `writeFileSync` |
-| `Bun.stdin.text()` | `Promise.resolve("")` (stdin недоступен) |
-| `Bun.sleep()` | `setTimeout` |
-| `Bun.stringWidth()` | npm `string-width` |
-| `Bun.version` | `process.version` |
-
-### Fetch Interceptor (run-node.mjs)
-
-Перехватывает HTTP-запросы к `opencode.ai` и добавляет `?key=<fingerprint>` для авторизации бесплатного тира.
-
-### Provider (provider.ts)
-
-- Использует `@ai-sdk/openai-compatible` SDK
-- Подключается к `opencode.ai` (Cloudflare) для списка моделей
-- Подключается к Alibaba Cloud (47.236.x) для инференса
-- SSE streaming через ReadableStream
-
-## Модели
-
-| Модель | Тип | Статус |
-|--------|-----|--------|
-| `opencode/mimo-v2.5-free` | Бесплатный | ✅ Работает |
-| `opencode/deepseek-v4-flash-free` | Бесплатный | ? |
-| `opencode/hy3-free` | Бесплатный | ❌ Null content |
-| `opencode/nemotron-3-ultra-free` | Бесплатный | ? |
-| `opencode/north-mini-code-free` | Бесплатный | ? |
-| `xiaomi/mimo-v2.5` | Платный | ? |
-| `xiaomi/mimo-v2.5-pro` | Платный | ? |
-
-## Авторизация
-
-Бесплатный тир использует `device fingerprint`:
-- Файл: `~/.local/share/mimocode/mimo-free-client`
-- Содержимое: SHA-256 хеш `(hostname|linux|x64|cpu-model|username)`
-- Auth flow: bootstrap → JWT → Bearer token
-- Endpoint: `api.xiaomimimo.com/api/free-ai/bootstrap`
-
-## Известные проблемы
-
-1. **yargs 18 + Node.js ESM**: `parse()` синхронный, не сохраняет промис handler. Решение: `globalThis.__handlerPromise`
-2. **esbuild зависает** на некоторых файлах (например, `continue` в ReadableStream). Решение: 5s таймаут + stripTypes fallback
-3. **Bun stdin** — в контексте ESM loader worker stdin используется для MessagePort IPC. Чтение stdin ломает протокол. Решение: всегда возвращать `""`.
-4. **`@esbuild/linux-x64`** — платформенный пакет не в node_modules. Решение: symlink из global npm.
-
-## Структура проекта
-
-```
-packages/opencode/
-├── run-node.mjs              # Entry point (main thread Bun shim)
-├── src/
-│   ├── util/txt-hooks.mjs    # ESM loader (resolve + load hooks)
-│   ├── cli/cmd/run.ts        # `mimo run` command handler
-│   ├── provider/provider.ts  # LLM provider (AI SDK)
-│   ├── server/server.ts      # In-process Hono HTTP server
-│   └── index.ts              # CLI entry (yargs)
-├── node_modules/
-│   └── @esbuild → symlink    # Platform binary
-└── migration/                # SQLite migrations
-```
-
-## Отладка
-
-### Логи на stderr
-
-ESM loader пишет в stderr:
-```
-[txt-hooks resolve] ./src/index.ts from .../run-node.mjs
-[txt-hooks load:ts] esbuild ok, output 7716 bytes
-```
-
-Handler пишет в stderr:
-```
-[RUN-DEBUG] handler entered, pid=12345
-[RUN-DEBUG] message built: привет
-[RUN-DEBUG] bootstrap callback entered
-```
-
-### Crash diagnostics
-
-Если процесс падает без вывода — проверяй stderr:
-```bash
-node --no-experimental-strip-types run-node.mjs run "тест" 2>/tmp/crash.log
-cat /tmp/crash.log | grep "RUN-DEBUG\|ERROR\|FATAL"
-```
-
-### Network tracing
-
-```bash
-# Какие IP ходит Bun:
-strace -f -e trace=connect ~/.mimocode/bin/mimo run "тест" 2>&1 | grep sin_addr
-
-# Какие IP ходит Node.js:
-strace -f -e trace=connect node --no-experimental-strip-types run-node.mjs run "тест" 2>&1 | grep sin_addr
-```
-
-## Rollback
-
-```bash
-# Полный откат к upstream:
-rm -rf MiMo-Code-main-patched
-cp -a MiMo-Code-main MiMo-Code-main-patched
-ln -s $(npm root -g)/@esbuild MiMo-Code-main-patched/packages/opencode/node_modules/@esbuild
-```
-
-## Сеть
-
-```
-opencode.ai (Cloudflare: 104.26.x, 172.67.x)
-    └── Список моделей, auth
-
-api.xiaomimimo.com (Azure: 20.47.x, 20.157.x)
-    └── Bootstrap JWT, free tier auth
-
-Alibaba Cloud (47.236.x, 47.237.x, 8.222.x)
-    └── LLM inference backend (mimo-v2.5-free и др.)
-```
-
-## Лицензия
-
-См. [LICENSE](LICENSE)
+Borodachamba Studio © 2026
