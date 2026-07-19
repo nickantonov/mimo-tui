@@ -13,12 +13,6 @@
 
 ---
 
-## Screenshot
-
-<p align="center">
-  <img src="assets/tui-screenshot.png" alt="MiMo TUI Console" width="600">
-</p>
-
 ## Quick Start
 
 ### Windows
