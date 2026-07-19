@@ -1,10 +1,25 @@
-# MiMo TUI v1.0
+<h1 align="center">MiMo TUI</h1>
 
-Автономний AI-асистент для програмування. Працює на Windows та Linux.
+<p align="center">
+  <img src="assets/mimocode-banner.png" alt="MiMo Code" width="700">
+</p>
 
-**Без Bun, без opencode, без SolidJS** — просто Python + Rich + MiMo free-tier API.
+<p align="center"><strong>Autonomous AI coding assistant for legacy hardware</strong></p>
 
-## Швидкий старт
+<p align="center">
+  <strong>No Bun • No opencode • No SolidJS</strong><br>
+  Just Python + Rich + MiMo free-tier API
+</p>
+
+---
+
+## Screenshot
+
+<p align="center">
+  <img src="assets/tui-screenshot.png" alt="MiMo TUI Console" width="600">
+</p>
+
+## Quick Start
 
 ### Windows
 ```bat
@@ -19,54 +34,56 @@ chmod +x install.sh run.sh
 ./run.sh
 ```
 
-## Що всередині
+## What's Inside
 
-| Компонент | Джерело | Призначення |
-|-----------|---------|-------------|
-| Brain (streaming + tool calling) | JARVIS | LLM engine з MiMo API + Ollama fallback |
-| 13 Tools | JARVIS | Файли, git, python, shell, система |
-| Memory (SQLite) | JARVIS | Граф знань, діалоги, бібліотека коду |
-| VibeCoder | JARVIS | Авто-повтор генерації коду |
-| Planner | JARVIS | Декомпозиція задач |
-| Cerebro | NATASHA7 | Особистість та навчання |
-| AST Analyzer | Predator | Аналіз якості Python коду |
-| Auth | Наша робота | MiMo free-tier bootstrap + fingerprint |
+| Component | Purpose |
+|-----------|---------|
+| **Brain** | Streaming + tool calling + Ollama fallback |
+| **13 Tools** | File ops, git, python exec, shell, system monitor |
+| **Memory** | SQLite knowledge graph, interactions, code library |
+| **VibeCoder** | Auto-retry code generation |
+| **Planner** | Autonomous task decomposition |
+| **Cerebro** | Personality and learning |
+| **AST Analyzer** | Python code quality checks |
+| **Auth** | MiMo free-tier bootstrap + fingerprint |
 
-## Команди
+## Commands
 
-- `/help` — Довідка
-- `/mode [назва]` — Режим (auto|code|plan|local|fast)
-- `/model s|f` — Модель (smart/fast)
-- `/plan <ціль>` — Додати задачу в планувальник
-- `/plans` — Черга планів
-- `/memory` — Статистика пам'яті
-- `/fact k=v` — Запам'ятати факт
-- `/ast <файл>` — AST перевірка Python файлу
-- `/cwd [шлях]` — Змінити робочу директорію
-- `/tokens` — Статистика токенів
-- `/status` — Системний статус (CPU/RAM)
-- `exit` — Вихід
+- `/help` — Show all commands
+- `/mode [name]` — Switch mode (auto|code|plan|local|fast)
+- `/model s|f` — Switch model (smart/fast)
+- `/plan <goal>` — Add task to autonomous planner
+- `/plans` — Show plan queue
+- `/memory` — Memory statistics
+- `/fact k=v` — Remember a fact
+- `/ast <file>` — AST check Python file
+- `/cwd [path]` — Change working directory
+- `/tokens` — Token usage stats
+- `/status` — System status (CPU/RAM)
+- `exit` — Quit
 
-## Режими
+## Modes
 
-- **AUTO** — Розумний автоматичний (за замовчуванням)
-- **CODE** — Вайбкодинг з авто-повтором
-- **PLAN** — Автономне планування задач
-- **LOCAL** — Тільки Ollama (офлайн)
-- **FAST** — Мала модель, економія токенів
+| Mode | Description |
+|------|-------------|
+| **AUTO** | Smart automatic (default) |
+| **CODE** | Vibe coding with auto-retry |
+| **PLAN** | Autonomous task planning |
+| **LOCAL** | Ollama only (offline) |
+| **FAST** | Small model, save tokens |
 
-## Залежності
+## Requirements
 
 - Python 3.10+
-- rich, psutil
-- Опціонально: Ollama (для локального fallback)
+- pip packages: `rich`, `psutil`
+- Optional: Ollama (for local fallback)
 
 ## API
 
-Використовує MiMo free-tier через opencode.ai:
-- Auth: device fingerprint (SHA-256)
-- Endpoint: `https://opencode.ai/zen/v1/chat/completions`
-- Моделі: mimo-auto, hy3-free, mimo-v2.5-free
+Uses MiMo free-tier via opencode.ai:
+- **Auth:** device fingerprint (SHA-256)
+- **Endpoint:** `https://opencode.ai/zen/v1/chat/completions`
+- **Models:** mimo-auto, hy3-free, mimo-v2.5-free
 
 ## Credits
 
