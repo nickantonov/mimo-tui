@@ -1,8 +1,6 @@
 """
 MiMo TUI — VibeCoder
 Autonomous coding loop: generate → execute → fix → retry.
-
-Based on JARVIS core/coder.py.
 """
 
 import re

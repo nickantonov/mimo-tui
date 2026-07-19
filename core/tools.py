@@ -1,8 +1,6 @@
 """
 MiMo TUI — Tools
 File ops, git, python execution, system monitoring.
-
-Based on JARVIS cat.py tools.
 """
 
 import ast
@@ -192,7 +190,7 @@ def calculate(expression: str) -> str:
         return f"ERROR: {e}"
 
 
-# ── AST analyzer (from Predator) ───────────────────────────────────────────────
+# ── AST analyzer ──────────────────────────────────────────────────────────────
 def ast_check(code: str) -> list:
     issues = set()
     try:

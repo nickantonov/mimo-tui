@@ -1,8 +1,6 @@
 """
 MiMo TUI — Planner
 Autonomous task decomposition and execution.
-
-Based on JARVIS core/planner.py.
 """
 
 import json

@@ -1,8 +1,6 @@
 """
 MiMo TUI — Memory (SQLite)
 Knowledge graph, interactions, code library.
-
-Based on JARVIS core/memory.py.
 """
 
 import json

@@ -2,8 +2,6 @@
 MiMo TUI — Brain
 LLM engine: MiMo free-tier (opencode.ai) + Ollama local fallback.
 Streaming, tool calling, model cascade, token tracking.
-
-Based on JARVIS core/brain.py, adapted for MiMo API.
 """
 
 import json

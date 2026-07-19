@@ -1,8 +1,6 @@
 """
 MiMo TUI — Cerebro
 Personality and learning system.
-
-Based on NATASHA7 core/cerebro.py.
 """
 
 import json
