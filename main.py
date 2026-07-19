@@ -1,11 +1,7 @@
 """
 MiMo TUI — Main
-Autonomous AI coding assistant for legacy Windows.
+Autonomous AI coding assistant for legacy hardware.
 No Bun, no opencode, no SolidJS — just Python + Rich + MiMo API.
-
-Extracted from: JARVIS (brain, tools, planner, memory, vibecoder),
-                NATASHA7 (cerebro), Predator (AST analyzer),
-                Our work (MiMo free-tier auth).
 """
 
 import json
@@ -283,6 +279,8 @@ BANNER = r"""
    ██║ ╚═╝ ██║██║███████║███████╗╚██████╗
    ╚═╝     ╚═╝╚═╝╚══════╝╚══════╝ ╚═════╝
 """
+AUTHOR = "Nick Antonov · Borodachamba Studio"
+VERSION = "v1.0"
 
 
 def main():
@@ -308,7 +306,8 @@ def main():
 
     # Banner
     console.print(f"[bold bright_cyan]{BANNER}[/bold bright_cyan]")
-    console.print("[bold cyan]      MiMo TUI v1.0 — Autonomous AI Assistant[/bold cyan]")
+    console.print(f"[bold cyan]      MiMo TUI {VERSION} — Autonomous AI Assistant[/bold cyan]")
+    console.print(f"[dim]      {AUTHOR}[/dim]")
     console.print("[dim]      Free-tier mode (opencode.ai) — No Bun required[/dim]")
     console.print()
 
